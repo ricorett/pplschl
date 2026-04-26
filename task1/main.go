@@ -8,5 +8,5 @@ func main() {
 		usdRub = 75.19
 	)
 	eurRub := usdRub * usdEur
-	fmt.Printf("%.2f\n", eurRub)
+	fmt.Printf("%.2f\n ", eurRub)
 }
