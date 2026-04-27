@@ -38,6 +38,8 @@ func calcCurrency(inputSrc string, number float64, inputDist string) float64 {
 			calculation = number / usdEur
 		case "rub":
 			calculation = number * eurRub
+		case "eur":
+			calculation = number
 		}
 	case "usd":
 		switch inputDist {
@@ -45,6 +47,8 @@ func calcCurrency(inputSrc string, number float64, inputDist string) float64 {
 			calculation = number / usdEur
 		case "rub":
 			calculation = number * usdRub
+		case "usd":
+			calculation = number
 		}
 
 	case "rub":
@@ -53,6 +57,8 @@ func calcCurrency(inputSrc string, number float64, inputDist string) float64 {
 			calculation = number / eurRub
 		case "usd":
 			calculation = number / usdRub
+		case "rub":
+			calculation = number
 		}
 	default:
 		fmt.Println("Error")
