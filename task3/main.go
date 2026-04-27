@@ -23,38 +23,36 @@ func main() {
 		if err != nil {
 			fmt.Println("Error:", err)
 			inputSrc, number, inputDist, err = getUserInput()
-		} else {
-			break
 		}
+		calc := calcCurrency(inputSrc, number, inputDist)
+		fmt.Printf("%.1f %s \n", calc, inputDist)
 	}
-	calc := calcCurrency(inputSrc, number, inputDist)
-	fmt.Printf("%.1f %s", calc, inputDist)
 
 }
 func calcCurrency(inputSrc string, number float64, inputDist string) float64 {
 	var calculation float64
-	switch inputDist {
+	switch inputSrc {
 	case "eur":
-		switch inputSrc {
+		switch inputDist {
 		case "usd":
-			calculation = number * usdEur
+			calculation = number / usdEur
 		case "rub":
-			calculation = number * usdRub
+			calculation = number * eurRub
 		}
 	case "usd":
-		switch inputSrc {
+		switch inputDist {
 		case "eur":
-			calculation = number * usdEur
+			calculation = number / usdEur
 		case "rub":
 			calculation = number * usdRub
 		}
 
 	case "rub":
-		switch inputSrc {
+		switch inputDist {
 		case "eur":
-			calculation = number * eurRub
+			calculation = number / eurRub
 		case "usd":
-			calculation = number * usdRub
+			calculation = number / usdRub
 		}
 	default:
 		fmt.Println("Error")
@@ -73,11 +71,18 @@ func getUserInput() (string, float64, string, error) {
 	}
 	input = strings.ToLower(input)
 
+	if !validateCurrency(input) {
+		return "", 0, "", fmt.Errorf("invalid input %s", input)
+	}
+
 	var number float64
 	fmt.Print("Введите сумму: ")
 	_, err = fmt.Scanln(&number)
 	if err != nil {
 		return "", 0, "", err
+	}
+	if number < 0 {
+		return "", 0, "", fmt.Errorf("number must not be negative: %f", number)
 	}
 
 	fmt.Print("Введите целевую валюту(USD, EUR, RUB): ")
@@ -88,5 +93,13 @@ func getUserInput() (string, float64, string, error) {
 	}
 	inputDist = strings.ToLower(inputDist)
 
+	if !validateCurrency(inputDist) {
+		return "", 0, "", fmt.Errorf("invalid input %s", inputDist)
+	}
+
 	return input, number, inputDist, nil
+}
+
+func validateCurrency(input string) bool {
+	return input == "eur" || input == "rub" || input == "usd"
 }
