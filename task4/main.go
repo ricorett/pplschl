@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -22,15 +25,17 @@ func getInput() string {
 }
 
 func getSlice() []int {
-	n := 0
-	slice := make([]int, n)
-	for {
-		fmt.Print("Enter slice value(0 for exit): ")
-		fmt.Scan(&n)
+	slice := make([]int, 0, 0)
+
+	fmt.Print("Enter slice : ")
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	parts := strings.Split(text, ",")
+
+	for _, p := range parts {
+		n, _ := strconv.Atoi(p)
 		slice = append(slice, n)
-		if n == 0 {
-			break
-		}
+
 	}
 	return slice
 }
