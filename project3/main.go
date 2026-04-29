@@ -2,12 +2,14 @@ package main
 
 import "fmt"
 
+type bookmarkMap map[string]string
+
 func main() {
 	mainMenu()
 }
 
 func mainMenu() {
-	bookmark := make(map[string]string)
+	bookmark := make(bookmarkMap)
 
 	for {
 		fmt.Println("1.Посмотреть закладки")
@@ -44,13 +46,13 @@ func getOperation(operation int) int {
 	return operation
 }
 
-func bookmarksLookup(bookmark map[string]string) {
+func bookmarksLookup(bookmark bookmarkMap) {
 	for key, value := range bookmark {
 		fmt.Printf("\n%s: %s\n", key, value)
 	}
 }
 
-func addBookmark(bookmark map[string]string) map[string]string {
+func addBookmark(bookmark bookmarkMap) bookmarkMap {
 	var key, value string
 	fmt.Println("Введите название ссылки:")
 	_, err := fmt.Scanln(&key)
@@ -68,7 +70,7 @@ func addBookmark(bookmark map[string]string) map[string]string {
 	return bookmark
 }
 
-func removeBookmark(bookmark map[string]string) map[string]string {
+func removeBookmark(bookmark bookmarkMap) bookmarkMap {
 	var key string
 	fmt.Println("Введите название ссылки для удаления:")
 	_, err := fmt.Scanln(&key)
