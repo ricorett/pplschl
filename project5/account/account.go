@@ -6,6 +6,8 @@ import (
 	"math/rand/v2"
 	"net/url"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 var letterRunes = []rune("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-*!")
@@ -23,7 +25,8 @@ type AccountWithTimestamp struct {
 }
 
 func (acc *Account) OutputPassword() {
-	fmt.Println(acc.login, acc.password, acc.url)
+	color.Cyan(acc.login)
+	fmt.Println(acc.password, acc.url)
 }
 
 func (acc *Account) generatePassword(n int) {
