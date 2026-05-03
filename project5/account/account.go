@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"net/url"
-	"time"
 
 	"github.com/fatih/color"
 )
@@ -13,20 +12,20 @@ import (
 var letterRunes = []rune("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-*!")
 
 type Account struct {
-	login    string
-	password string
-	url      string
+	Login    string `json : "login"`
+	Password string `json : "password"`
+	Url      string `json : "url"`
 }
 
-type AccountWithTimestamp struct {
-	Account
-	createdAt time.Time
-	updatedAt time.Time
-}
+//type AccountWithTimestamp struct {
+//	Account
+//	createdAt time.Time
+//	updatedAt time.Time
+//}
 
 func (acc *Account) OutputPassword() {
-	color.Cyan(acc.login)
-	fmt.Println(acc.password, acc.url)
+	color.Cyan(acc.Login)
+	fmt.Println(acc.Password, acc.Url)
 }
 
 func (acc *Account) generatePassword(n int) {
@@ -34,10 +33,10 @@ func (acc *Account) generatePassword(n int) {
 	for i := range pass {
 		pass[i] = letterRunes[rand.IntN(len(letterRunes))]
 	}
-	acc.password = string(pass)
+	acc.Password = string(pass)
 }
 
-func NewAccountWithTimeStamp(login, password, urlString string) (*AccountWithTimestamp, error) {
+func NewAccount(login, password, urlString string) (*Account, error) {
 
 	_, err := url.ParseRequestURI(urlString)
 
@@ -49,15 +48,12 @@ func NewAccountWithTimeStamp(login, password, urlString string) (*AccountWithTim
 		return nil, errors.New("login required")
 	}
 
-	newAcc := &AccountWithTimestamp{
-		createdAt: time.Now(),
-		updatedAt: time.Now(),
-		Account: Account{
-			login:    login,
-			url:      urlString,
-			password: password,
-		},
+	newAcc := &Account{
+		Login:    login,
+		Url:      urlString,
+		Password: password,
 	}
+
 	if password == "" {
 		newAcc.generatePassword(12)
 
