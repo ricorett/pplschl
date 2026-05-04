@@ -1,12 +1,12 @@
 package storage
 
 import (
-	_ "bins/bin"
+	"bins/bin"
 	"encoding/json"
 	"os"
 )
 
-func SaveBin(BinList List, filename string) error {
+func SaveBin(BinList bin.List, filename string) error {
 	file, err := json.Marshal(BinList)
 	if err != nil {
 		return err
@@ -14,7 +14,7 @@ func SaveBin(BinList List, filename string) error {
 	return os.WriteFile(filename, file, 0644)
 }
 
-func ReadBin(BinList List, filename string) error {
+func ReadBin(BinList bin.List, filename string) error {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		return err
