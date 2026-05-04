@@ -14,7 +14,7 @@ func SaveBin(BinList bin.List, filename string) error {
 	return os.WriteFile(filename, file, 0644)
 }
 
-func ReadBin(BinList bin.List, filename string) error {
+func ReadBin(BinList *bin.List, filename string) error {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		return err
