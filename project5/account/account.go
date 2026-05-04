@@ -23,7 +23,7 @@ type Account struct {
 //	updatedAt time.Time
 //}
 
-func (acc *Account) OutputPassword() {
+func (acc *Account) Output() {
 	color.Cyan(acc.Login)
 	fmt.Println(acc.Password, acc.Url)
 }
