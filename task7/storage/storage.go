@@ -19,7 +19,7 @@ func ReadBin(BinList *bin.List, filename string) error {
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(file, &BinList)
+	err = json.Unmarshal(file, BinList)
 	if err != nil {
 		return err
 	}
