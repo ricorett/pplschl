@@ -6,6 +6,12 @@ import (
 	"os"
 )
 
+type BinOp interface{
+	SaveBin(bin.List, string) error
+	ReadBin(*bin.List, string) error
+}
+
+
 func SaveBin(BinList bin.List, filename string) error {
 	file, err := json.Marshal(BinList)
 	if err != nil {
