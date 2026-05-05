@@ -3,26 +3,31 @@ package main
 import (
 	"fmt"
 	"passwordManager/account"
+	"passwordManager/output"
+
+	"passwordManager/files"
 
 	"github.com/fatih/color"
 )
 
 func main() {
-	vault := account.NewVault()
-	//1 create account
-	//2 find account
-	//3 delete account
-	//4 exit
-	//createAccount()
+	vault := account.NewVaultWithDb(files.NewJsonDB("data.json"))
+	// vault := account.NewVaultWithDb(cloud.NewCloudDB("https://a.ru"))
 Menu:
 	for {
-		choose := getMenu()
+		choose := promptData([]string{
+		"1. Создать аккаунт", 
+		"2. Найти аккаунт",
+		"3. Удалить аккаунт",
+		"4. Выйти",
+		"Выберите вариант",
+		})
 		switch choose {
-		case 1:
+		case "1":
 			createAccount(vault)
-		case 2:
+		case "2":
 			findAccount(vault)
-		case 3:
+		case "3":
 			deleteAccount(vault)
 		default:
 			break Menu
@@ -30,35 +35,35 @@ Menu:
 	}
 }
 
-func getMenu() int {
-	var choose int
+// func getMenu() int {
+// 	var choose int
 
-	fmt.Println("Выберите вариант")
-	fmt.Println("1. Создать аккаунт")
-	fmt.Println("2. Найти аккаунт")
-	fmt.Println("3. Удалить аккаунт")
-	fmt.Println("4. Выйти")
-	_, err := fmt.Scan(&choose)
-	if err != nil {
-		return 0
-	}
+// 	fmt.Println("Выберите вариант")
+// 	fmt.Println("")
+// 	fmt.Println("2. Найти аккаунт")
+// 	fmt.Println()
+// 	fmt.Println("4. Выйти")
+// 	_, err := fmt.Scan(&choose)
+// 	if err != nil {
+// 		return 0
+// 	}
 
-	return choose
-}
+// 	return choose
+// }
 
-func deleteAccount(vault *account.Vault) {
-	url := promptData("Введите юрл для удаления")
+func deleteAccount(vault *account.VaultWithDb) {
+	url := promptData([]string{"Введите юрл для удаления"})
 	isDeleted := vault.DeleteAccountByUrl(url)
 	if isDeleted {
 		color.Green("Deleted")
 
 	} else {
-		color.Red("Not Deleted")
+		output.PrintError("Не найдено")
 	}
 }
 
-func findAccount(vault *account.Vault) {
-	url := promptData("Введите юрл для поиска")
+func findAccount(vault *account.VaultWithDb) {
+	url := promptData([]string{"Введите юрл для поиска"})
 	accounts := vault.FindAccountsByUrl(url)
 	if len(accounts) == 0 {
 		color.Red("Accounts not found")
@@ -68,23 +73,29 @@ func findAccount(vault *account.Vault) {
 	}
 }
 
-func promptData(prompt string) string {
-
-	fmt.Print(prompt + ": ")
+func promptData[T any](prompt []T) string {
+	for i, line := range prompt{
+		if i == len(prompt) - 1 {
+				fmt.Printf("%v: ", line)
+		} else {
+			fmt.Println(line)
+		}
+	}
+	
 	var res string
 	fmt.Scanln(&res)
 	return res
 }
 
-func createAccount(vault *account.Vault) {
+func createAccount(vault *account.VaultWithDb) {
 
-	login := promptData("Введите логин")
-	password := promptData("Введите пароль")
-	url := promptData("Введите url")
+	login := promptData([]string{"Введите логин"})
+	password := promptData([]string{"Введите пароль"})
+	url := promptData([]string{"Введите url"})
 
 	account1, err := account.NewAccount(login, password, url)
 	if err != nil {
-		fmt.Println("неверный формат url")
+		output.PrintError("Неверный формат URL или Login")
 		return
 	}
 

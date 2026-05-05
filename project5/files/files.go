@@ -3,36 +3,49 @@ package files
 import (
 	"fmt"
 	"os"
+	"passwordManager/output"
 )
 
-func ReadFile(name string) ([]byte, error) {
+type JsonDB struct {
+	filename string
+}
 
-	data, err := os.ReadFile(name)
+
+
+func NewJsonDB(name string) *JsonDB {
+	return &JsonDB{
+		filename: name,
+	}
+}
+
+func (db *JsonDB) Read() ([]byte, error) {
+
+	data, err := os.ReadFile(db.filename)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	//fmt.Println(string(data))
+	
 	return data, nil
 }
 
-func WriteFile(content []byte, name string) {
-	file, err := os.Create(name)
+func (db *JsonDB) Write(content []byte) {
+	file, err := os.Create(db.filename)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	_, err = file.Write(content)
 	if err != nil {
-		fmt.Println(err)
+		output.PrintError(err)
 		return
 	}
 
-	fmt.Println("File written to: " + name)
+	fmt.Println("File written to: " + db.filename)
 	defer func(file *os.File) {
 		err = file.Close()
 		if err != nil {
-			fmt.Println(err)
+			output.PrintError(err)
 		}
 	}(file)
 }

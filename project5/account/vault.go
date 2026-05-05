@@ -2,16 +2,35 @@ package account
 
 import (
 	"encoding/json"
-	"passwordManager/files"
+	"passwordManager/output"
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
+	
 )
 
 type Vault struct {
 	Accounts  []Account `json:"accounts"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type VaultWithDb struct{
+	Vault
+	db Db
+}
+
+type ByteReader interface{
+	Read() ([]byte, error)
+}
+
+
+type ByteWriter interface{
+	Write([]byte)
+}
+
+type Db interface{
+	ByteWriter
+	ByteReader
 }
 
 func (v *Vault) ToBytes() ([]byte, error) {
@@ -23,33 +42,35 @@ func (v *Vault) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-func NewVault() *Vault {
-	file, err := files.ReadFile("data.json")
+func NewVaultWithDb(db Db) *VaultWithDb {
+	
+	file, err := db.Read()
 	if err != nil {
-		return &Vault{
+		return &VaultWithDb{
+			Vault : Vault{
 			Accounts:  []Account{},
 			UpdatedAt: time.Now(),
+			}, 
+			db : db,
 		}
 	}
 	var vault Vault
 	err = json.Unmarshal(file, &vault)
 	if err != nil {
-		color.Red(err.Error())
+		output.PrintError(err)
 	}
-	return &vault
+	return &VaultWithDb{
+		Vault: vault,
+		db: db,
+	}
 }
 
-func (v *Vault) AddAccount(acc Account) {
+func (v *VaultWithDb) AddAccount(acc Account) {
 	v.Accounts = append(v.Accounts, acc)
-	v.UpdatedAt = time.Now()
-	data, err := v.ToBytes()
-	if err != nil {
-		color.Red(" Не удалось преобразовать")
-	}
-	files.WriteFile(data, "data.json")
+	v.save()
 }
 
-func (v *Vault) FindAccountsByUrl(url string) []Account {
+func (v *VaultWithDb) FindAccountsByUrl(url string) []Account {
 	var accounts []Account
 	for _, acc := range v.Accounts {
 		isMatches := strings.Contains(url, acc.Url)
@@ -61,7 +82,7 @@ func (v *Vault) FindAccountsByUrl(url string) []Account {
 	return accounts
 }
 
-func (v *Vault) DeleteAccountByUrl(url string) bool {
+func (v *VaultWithDb) DeleteAccountByUrl(url string) bool {
 	var accounts []Account
 	isDeleted := false
 	for _, acc := range v.Accounts {
@@ -73,12 +94,16 @@ func (v *Vault) DeleteAccountByUrl(url string) bool {
 
 	}
 	v.Accounts = accounts
-	v.UpdatedAt = time.Now()
-	data, err := v.ToBytes()
-	if err != nil {
-		color.Red(err.Error())
-	}
-	files.WriteFile(data, "data.json")
-
+	v.save()
 	return isDeleted
+}
+
+func (vault *VaultWithDb) save(){
+	vault.UpdatedAt = time.Now()
+	data, err := vault.Vault.ToBytes()
+	if err != nil {
+		output.PrintError(err)
+	}
+	vault.db.Write(data)
+
 }

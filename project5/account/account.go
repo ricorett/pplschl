@@ -17,12 +17,6 @@ type Account struct {
 	Url      string `json : "url"`
 }
 
-//type AccountWithTimestamp struct {
-//	Account
-//	createdAt time.Time
-//	updatedAt time.Time
-//}
-
 func (acc *Account) Output() {
 	color.Cyan(acc.Login)
 	fmt.Println(acc.Password, acc.Url)
