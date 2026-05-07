@@ -3,7 +3,6 @@ package account
 import (
 	"encoding/json"
 	"passwordManager/output"
-	"strings"
 	"time"
 
 	
@@ -70,10 +69,10 @@ func (v *VaultWithDb) AddAccount(acc Account) {
 	v.save()
 }
 
-func (v *VaultWithDb) FindAccountsByUrl(url string) []Account {
+func (v *VaultWithDb) FindAccounts(str string, checker func(Account, string)bool) []Account {
 	var accounts []Account
 	for _, acc := range v.Accounts {
-		isMatches := strings.Contains(url, acc.Url)
+		isMatches := checker(acc, str)
 		if isMatches {
 			accounts = append(accounts, acc)
 		}
