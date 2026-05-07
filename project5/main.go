@@ -8,7 +8,15 @@ import (
 	"passwordManager/files"
 
 	"github.com/fatih/color"
+	"strings"
 )
+
+var menu =  map[string]func(*account.VaultWithDb){
+	"1" : createAccount,
+	"2" : findAccountByUrl,
+	"3" : findAccountByLogin,
+	"4" : deleteAccount,
+}
 
 func main() {
 	vault := account.NewVaultWithDb(files.NewJsonDB("data.json"))
@@ -17,21 +25,18 @@ Menu:
 	for {
 		choose := promptData([]string{
 		"1. Создать аккаунт", 
-		"2. Найти аккаунт",
-		"3. Удалить аккаунт",
-		"4. Выйти",
+		"2. Найти аккаунт по URL",
+		"3. Поиск по логину",
+		"4. Удалить аккаунт",
+		"5. Выйти",
 		"Выберите вариант",
 		})
-		switch choose {
-		case "1":
-			createAccount(vault)
-		case "2":
-			findAccount(vault)
-		case "3":
-			deleteAccount(vault)
-		default:
+		menuFunc := menu[choose]
+		if menuFunc == nil {
 			break Menu
 		}
+		menuFunc(vault)
+		
 	}
 }
 
@@ -62,13 +67,27 @@ func deleteAccount(vault *account.VaultWithDb) {
 	}
 }
 
-func findAccount(vault *account.VaultWithDb) {
+func findAccountByUrl(vault *account.VaultWithDb) {
 	url := promptData([]string{"Введите юрл для поиска"})
-	accounts := vault.FindAccountsByUrl(url)
-	if len(accounts) == 0 {
+	accounts := vault.FindAccounts(url, func(acc account.Account, str string)bool{
+		return strings.Contains(acc.Url, str)
+	} )
+	outputResult(&accounts)
+}
+
+func findAccountByLogin(vault *account.VaultWithDb) {
+	login := promptData([]string{"Введите юрл для поиска"})
+	accounts := vault.FindAccounts(login, func(acc account.Account, str string)bool{
+		return strings.Contains(acc.Login, str)
+	} )
+	outputResult(&accounts)
+}
+
+func outputResult(accounts *[]account.Account){
+	if len(*accounts) == 0 {
 		color.Red("Accounts not found")
 	}
-	for _, acc := range accounts {
+	for _, acc := range *accounts {
 		acc.Output()
 	}
 }
