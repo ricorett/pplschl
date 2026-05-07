@@ -43,13 +43,14 @@ func getSlice() []int {
 func calcOperation(operation string, slice []int) int {
 	operation = strings.ToUpper(operation)
 	result := 0
-	switch operation {
-	case "AVG":
-		result = calcAvg(slice)
-	case "SUM":
-		result = calcSum(slice)
-	case "MED":
-		result = calcMed(slice)
+	m := map[string]func([]int) int{
+		"AVG": calcAvg,
+		"SUM": calcSum,
+		"MED": calcMed,
+	}
+	
+	if fn, ok := m[operation]; ok {
+		result = fn(slice)
 	}
 	return result
 }
