@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	// "os"
 	"passwordManager/account"
+	"passwordManager/encrypter"
 	"passwordManager/output"
 
 	"passwordManager/files"
 
-	"github.com/fatih/color"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 )
 
 var menu =  map[string]func(*account.VaultWithDb){
@@ -19,8 +23,15 @@ var menu =  map[string]func(*account.VaultWithDb){
 }
 
 func main() {
-	vault := account.NewVaultWithDb(files.NewJsonDB("data.json"))
+
+	
 	// vault := account.NewVaultWithDb(cloud.NewCloudDB("https://a.ru"))
+	err := godotenv.Load()
+	if err != nil {
+		output.PrintError("Не удалость найти env файл")
+	}
+	vault := account.NewVaultWithDb(files.NewJsonDB("data.vault"), *encrypter.NewEncrypter())
+
 Menu:
 	for {
 		choose := promptData([]string{
@@ -40,21 +51,7 @@ Menu:
 	}
 }
 
-// func getMenu() int {
-// 	var choose int
 
-// 	fmt.Println("Выберите вариант")
-// 	fmt.Println("")
-// 	fmt.Println("2. Найти аккаунт")
-// 	fmt.Println()
-// 	fmt.Println("4. Выйти")
-// 	_, err := fmt.Scan(&choose)
-// 	if err != nil {
-// 		return 0
-// 	}
-
-// 	return choose
-// }
 
 func deleteAccount(vault *account.VaultWithDb) {
 	url := promptData([]string{"Введите юрл для удаления"})
@@ -76,7 +73,7 @@ func findAccountByUrl(vault *account.VaultWithDb) {
 }
 
 func findAccountByLogin(vault *account.VaultWithDb) {
-	login := promptData([]string{"Введите юрл для поиска"})
+	login := promptData([]string{"Введите логин для поиска"})
 	accounts := vault.FindAccounts(login, func(acc account.Account, str string)bool{
 		return strings.Contains(acc.Login, str)
 	} )
