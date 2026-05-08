@@ -1,12 +1,16 @@
 package bin
 
-import "time"
+import (
+	"bins/config"
+	"time"
+)
 
 type Bin struct {
 	Id        string
 	Private   bool
 	CreatedAt time.Time
 	Name      string
+	env 	config.Env
 }
 
 type List struct {
